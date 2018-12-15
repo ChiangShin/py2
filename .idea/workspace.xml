@@ -59,7 +59,7 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="11" selection-start-column="11" selection-end-column="11" />
+              <caret lean-forward="true" />
             </state>
           </provider>
         </entry>
@@ -735,7 +735,7 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret column="11" selection-start-column="11" selection-end-column="11" />
+          <caret lean-forward="true" />
         </state>
       </provider>
     </entry>
