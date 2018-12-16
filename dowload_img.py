@@ -8,6 +8,11 @@ import multiprocessing
 from PIL import Image
 from io import BytesIO
 
+headers = {
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/68.0.3440.106 Safari/537.36'
+    }
+
 
 def read_file(path, file_name):
     # 待下载的图片
@@ -22,7 +27,7 @@ def read_file(path, file_name):
     print("已保存的图片数set："+str(len(saved_img_names)))
 
     # 保存未下载的
-    need_dowload_img_srcs = []
+    need_download_img_srcs = []
     for src in srcs:
         src_tmp = re.sub(r'.*large/', '', src).replace("\n", "")
         text_tpm1 = re.sub(r'-[0-9]*.jpg', '', src_tmp)
@@ -31,25 +36,27 @@ def read_file(path, file_name):
         text_tpm1 = "/".join(text_tpm_list1)
         text = text_tpm1 + "/" + src_tmp.split("/")[-1]
         if text not in saved_img_names:
-           need_dowload_img_srcs.append(src)
+           need_download_img_srcs.append(src)
 
-    print("需要下载的数量need_dowload_img_srcs：" + str(len(need_dowload_img_srcs)))
+    print("需要下载的数量need_download_img_srcs：" + str(len(need_download_img_srcs)))
 
     # 进程数
     jc_num = 10
-    if len(need_dowload_img_srcs) > jc_num:
+    if len(need_download_img_srcs) > jc_num:
+        need_download_img_srcs.reverse()
         # 每个进程分配的链接数量
-        jc_size = math.ceil(len(need_dowload_img_srcs)/jc_num)
-        res = partition(need_dowload_img_srcs, jc_size)
+        jc_size = math.ceil(len(need_download_img_srcs)/jc_num)
+        res = partition(need_download_img_srcs, jc_size)
         for i in range(jc_num):
-            multiprocessing.Process(target=dowload_task, args=(res[i], path,)).start()
+            multiprocessing.Process(target=download_task, args=(res[i], path,)).start()
     else:
-        dowload_task(need_dowload_img_srcs, path)
+        download_task(need_download_img_srcs, path)
 
 
-def dowload_task(src_list, path):
+def download_task(src_list, path):
     for src in src_list:
-        src_tmp = re.sub(r'.*large/', '', src).replace("\n", "")
+        src = src.replace("\n", "")
+        src_tmp = re.sub(r'.*large/', '', src)
         text_tpm1 = re.sub(r'-[0-9]*.jpg', '', src_tmp)
         text_tpm_list1 = text_tpm1.split("/")
         text_tpm_list1.reverse()
@@ -62,16 +69,16 @@ def dowload_task(src_list, path):
 # 下载图片
 def download_img(img_src, pathfile):
     try:
-        sleeptime = random.randrange(0, 200)
-        time.sleep(sleeptime/100)
+        sleep_time = random.randrange(0, 200)
+        time.sleep(sleep_time/100)
         # print("img_src:"+img_src+"   pathfile:"+pathfile)
-        response = requests.get(img_src)
+        response = requests.get(img_src, headers=headers, timeout=10)
         response.encoding = 'utf-8'
         image = Image.open(BytesIO(response.content))
-        imgname = img_src.split("/")[-1]
+        img_name = img_src.split("/")[-1]
         if not os.path.exists(pathfile):
             os.makedirs(pathfile)
-        image.save(pathfile+"/"+imgname)
+        image.save(pathfile+"/"+img_name)
         print("下载成功：" + img_src)
     except IOError as e:
         print("IOError，下载失败："+img_src)

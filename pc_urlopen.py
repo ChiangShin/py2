@@ -74,7 +74,7 @@ def get_page_img_src(page_url):
 
 
 if __name__ == '__main__':
-    key_word = 'Maria_Ryabushkina'
+    key_word = 'Emily'
     root_path = 'D://chaos//'
     # for page_index in range(1, 6):
     #     get_all_page_url(root_path, page_index, key_word)
